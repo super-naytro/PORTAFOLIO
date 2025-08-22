@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Chat P2P Individual y Grupal</title>
+  <script src="https://cdn.jsdelivr.net/npm/peerjs@1.4.7/dist/peerjs.min.js"></script>
+  <link rel="stylesheet" href="demo-minimal.css" />
+</head>
+<body>
+
+
+<div class="main-container">
+<div id="popup">
+  <form id="loginForm">
+    <h3>Ingrese usuario e ID</h3>
+    <input type="text" id="username" placeholder="Nombre de usuario" required /><br /><br />
+    <input type="text" id="userid" placeholder="ID formato x"
+      pattern="^\w{1}"
+      title="Debe tener el formato x"
+      required /><br /><br />
+    <button type="submit">Entrar</button>
+  </form>
+</div>
+
+<div id="popupGrupo" style="display:none;">
+  <div>
+    <h3>Grupo</h3>
+    <button onclick="crearGrupo()">Crear Grupo</button>
+    <button onclick="unirseGrupo()">Unirse a Grupo</button><br><br>
+    <button onclick="cerrarPopupGrupo()">Cancelar</button>
+  </div>
+</div>
+
+  <h2>Chat P2P Volátil</h2>
+  <div style="margin-bottom:1em;">Mi ID: <span id="my-id"></span></div>
+
+  <div style="width:100%;display:flex;gap:0.5em;justify-content:center;flex-wrap:wrap;">
+    <input id="connectToId" placeholder="ID a quien quieres hablar" style="flex:1;min-width:120px;max-width:180px;" />
+    <button onclick="requestConnection()">Solicitar conexión</button>
+    <button onclick="abrirPopupGrupo()">Grupo</button>
+  </div>
+
+  <div id="requestBox">
+    <p><b>Solicitud de conexión de:</b> <span id="requestFrom"></span></p>
+    <button onclick="acceptRequest()">Aceptar</button>
+    <button onclick="rejectRequest()">Rechazar</button>
+  </div>
+
+  <h4 style="margin-top:1em;">Chat con: <span id="current-peer">Nadie</span></h4>
+  <div id="chat"></div>
+  <div style="width:100%;display:flex;gap:0.5em;justify-content:center;">
+    <input id="msg" placeholder="Mensaje" style="flex:1;min-width:120px;max-width:180px;" />
+    <button onclick="send()">Enviar</button>
+  </div>
+</div>
+
+<script>
+// ...existing code...
+// ...existing code...
+var x1=[],x2,x3,x4,x5=false,x6=null;
+const x7=document.getElementById("chat"),x8=document.getElementById("current-peer"),x9=document.getElementById("requestBox"),x10=document.getElementById("requestFrom"),x11=new Audio('https://www.soundjay.com/buttons/sounds/button-16.mp3');
+function notificarMensaje(){x11.play().catch(()=>{});navigator.vibrate&&navigator.vibrate(100)}
+function mensajePropio(a,b){x7.innerHTML+=`<div style=\"color:#4caf50\"><b>${b}:</b> ${a}</div>`;x7.scrollTop=x7.scrollHeight}
+function recibirMensaje(a,b){x7.innerHTML+=`<div><b>${b}:</b> ${a}</div>`;notificarMensaje();x7.scrollTop=x7.scrollHeight}
+function showRequest(a,b){x6=a;x10.textContent=b;x9.style.display="block"}
+function cerrarPopupGrupo(){document.getElementById("popupGrupo").style.display="none"}
+function abrirPopupGrupo(){document.getElementById("popupGrupo").style.display="flex"}
+function acceptRequest(){if(!x6)return;x3=x6;x8.textContent=x3.peer;x7.innerHTML="";setupConnection();x3.send("__ACCEPTED__");x9.style.display="none";x6=null}
+function rejectRequest(){if(!x6)return;x6.send("__REJECTED__");x6.close();x9.style.display="none";x6=null}
+function send(){var a=document.getElementById("msg").value.trim();if(!a)return;mensajePropio(a,x4);x5?x1.forEach(b=>b.send(`${x4}: ${a}`)):x3&&x3.open?x3.send(`${x4}: ${a}`):alert("No hay conexión activa");document.getElementById("msg").value=""}
+function setupConnection(){x3.on("data",a=>{recibirMensaje(a,x3.peer)});x3.on("close",()=>{recibirMensaje("<i>Conexión cerrada</i>","");x8.textContent="Nadie";x3=null})}
+function crearGrupo(){cerrarPopupGrupo();var a=prompt("ID del grupo (XX-XX-XXX-XX):"),b=/^\w{2}-\w{2}-\w{3}-\w{2}$/;if(!b.test(a)){alert("Formato incorrecto");return}x5=true;x1=[];x2=new Peer(a);x2.on("open",c=>{document.getElementById("popup").style.display="none";document.getElementById("my-id").textContent=c;x8.textContent="Grupo "+c;x7.innerHTML="";recibirMensaje("<i>Grupo creado, esperando miembros...</i>","")});x2.on("connection",c=>{x1.push(c);c.on("data",d=>{x1.forEach(e=>{e.peer!==c.peer&&e.send(d)});recibirMensaje(d,c.peer)})})}
+function unirseGrupo(){cerrarPopupGrupo();var a=prompt("ID del grupo (XX-XX-XXX-XX):"),b=/^\w{2}-\w{2}-\w{3}-\w{2}$/;if(!b.test(a)){alert("Formato incorrecto");return}var c=x2.connect(a);c.on("open",()=>{x3=c;x8.textContent="Grupo "+a;x7.innerHTML="";recibirMensaje("<i>Conectado al grupo</i>","");c.on("data",d=>{recibirMensaje(d,"Grupo")})});c.on("error",d=>{alert("Error: "+d)})}
+function requestConnection(){var a=document.getElementById("connectToId").value.trim();if(!a)return alert("Ingresa un ID válido");x3&&(x3.close(),x7.innerHTML="",x8.textContent="Nadie");var b=x2.connect(a);b.on("open",()=>{b.send(`__REQUEST__:${x4}`)});b.on("data",c=>{if(c==="__ACCEPTED__"){x3=b;x8.textContent=a;x7.innerHTML="";setupConnection()}else if(c==="__REJECTED__"){alert("Solicitud rechazada");b.close()}else if(c==="__BUSY__"){alert("El usuario está ocupado");b.close()}});b.on("error",c=>{alert("Error: "+c)})}
+document.getElementById("loginForm").onsubmit=a=>{a.preventDefault();x4=document.getElementById("username").value.trim();var b=document.getElementById("userid").value.trim(),c=/^\w{1}$/;if(!c.test(b)){alert("El ID debe tener el formato x");return}x2=new Peer(b);x2.on("open",d=>{document.getElementById("popup").style.display="none";document.getElementById("my-id").textContent=d});x2.on("error",d=>{if(d.type==="unavailable-id"){alert("El ID ya está en uso.");document.getElementById("popup").style.display="flex"}else alert("Error: "+d)});x2.on("connection",d=>{if(x5){x1.push(d);d.on("data",e=>{x1.forEach(f=>{f.peer!==d.peer&&f.send(e)});recibirMensaje(e,d.peer)})}else{if(x3){d.on("open",()=>{d.send("__BUSY__");d.close()});return}d.on("data",e=>{e.startsWith("__REQUEST__")&&(showRequest(d,e.split(":")[1]))})}})}
+</script>
+
+</body>
+</html>

@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Contacto - Portafolio</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    @media (max-width: 900px) {
+      .contacto-nuevo {
+        flex-direction: column;
+        gap: 1.5rem;
+        align-items: center;
+      }
+      .contacto-nuevo > div {
+        min-width: 90vw !important;
+        max-width: 98vw;
+        margin: 0 auto;
+      }
+    }
+    @media (max-width: 600px) {
+      .contacto-nuevo > div {
+        padding: 1rem !important;
+      }
+      .contacto-nuevo img {
+        width: 60px !important;
+        height: 60px !important;
+      }
+      h2, h3 {
+        font-size: 1.2rem !important;
+      }
+      .boton-enlace {
+        font-size: 1rem !important;
+        padding: 0.6rem 1.2rem !important;
+      }
+    }
+  </style>
+</head>
+<body>
+    <header>
+    <nav>
+    <div style="display: flex; align-items: center; gap: 1rem;">
+             <img src="Imagenes/mi.jpeg" alt="Mi imagen" class="imagen-portafolio">
+        <div>
+          <h1 class="titulo-nav"><a href="curriculum.pdf" class="boton boton-cv" download style="display:block; margin-top:0.5rem; width:max-content;">Joseph padilla CV</a></h1>
+          
+        </div>
+      </div>
+      <ul style="display:flex; gap:1rem; justify-content:flex-end; align-items:center; margin:0; padding:0; list-style:none;">
+        <li><a href="index.html" >Sobre mí</a></li>
+        <li><a href="certificados.html">Certificados</a></li>
+        <li><a href="proyectos.html">Proyectos</a></li>
+        <li><a href="contactos.html" class="activo">Contacto</a></li>
+      </ul>
+      
+  </header>
+
+  <main>
+    <h2>¡Conecta conmigo!</h2>
+    <div class="contacto-nuevo" style="display: flex; flex-wrap: wrap; gap: 2.5rem; justify-content: center; align-items: flex-start; margin-top: 2.5rem;">
+      <div style="min-width: 260px; background: #222; border-radius: 16px; box-shadow: 0 2px 12px #1976d2; padding: 2rem; text-align: center;">
+        <h3>Redes y Mensajería</h3>
+        <a href="https://wa.me/50499999999" target="_blank" class="boton-enlace" style="display:block; margin:1rem auto; padding:0.8rem 2rem; background:linear-gradient(90deg,#25d366 0%,#128c7e 100%); color:#fff; border-radius:8px; text-decoration:none; font-weight:bold;">WhatsApp</a>
+        <a href="mailto:tuemail@ejemplo.com" class="boton-enlace" style="display:block; margin:1rem auto; padding:0.8rem 2rem; background:linear-gradient(90deg,#1976d2 0%,#8e24aa 100%); color:#fff; border-radius:8px; text-decoration:none; font-weight:bold;">Correo</a>
+        <a href="https://instagram.com/tuusuario" target="_blank" class="boton-enlace" style="display:block; margin:1rem auto; padding:0.8rem 2rem; background:linear-gradient(90deg,#e1306c 0%,#fdc468 100%); color:#fff; border-radius:8px; text-decoration:none; font-weight:bold;">Instagram</a>
+        <a href="https://github.com/tuusuario" target="_blank" class="boton-enlace" style="display:block; margin:1rem auto; padding:0.8rem 2rem; background:linear-gradient(90deg,#333 0%,#6e5494 100%); color:#fff; border-radius:8px; text-decoration:none; font-weight:bold;">GitHub</a>
+      </div>
+      <div style="min-width: 260px; background: #222; border-radius: 16px; box-shadow: 0 2px 12px #8e44ad; padding: 2rem; text-align: center;">
+        <h3>Teléfono y LinkedIn</h3>
+        <a href="tel:+50499999999" class="boton-enlace" style="display:block; margin:1rem auto; padding:0.8rem 2rem; background:linear-gradient(90deg,#1976d2 0%,#5e81f4 100%); color:#fff; border-radius:8px; text-decoration:none; font-weight:bold;">Llamar</a>
+        <a href="https://www.linkedin.com/in/tuusuario" target="_blank" class="boton-enlace" style="display:block; margin:1rem auto; padding:0.8rem 2rem; background:linear-gradient(90deg,#0a66c2 0%,#1976d2 100%); color:#fff; border-radius:8px; text-decoration:none; font-weight:bold;">LinkedIn</a>
+      </div>
+      <div style="min-width: 260px; background: #222; border-radius: 16px; box-shadow: 0 2px 12px #5e35b1; padding: 2rem; text-align: center;">
+        <h3>¡Escanea y conecta!</h3>
+        <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://www.linkedin.com/in/tuusuario" alt="QR LinkedIn" style="margin:1rem auto; border-radius:8px; box-shadow:0 2px 8px #1976d2;">
+        <p style="color:#fff; margin-top:1rem;">Escanea el código QR para ir directo a mi LinkedIn.</p>
+      </div>
+      <div style="min-width: 260px; background: #222; border-radius: 16px; box-shadow: 0 2px 12px #fdc468; padding: 2rem; text-align: center;">
+        <h3>¡Agenda una videollamada!</h3>
+        <a href="https://meet.google.com/" target="_blank" class="boton-enlace" style="display:block; margin:1rem auto; padding:0.8rem 2rem; background:linear-gradient(90deg,#1976d2 0%,#fdc468 100%); color:#fff; border-radius:8px; text-decoration:none; font-weight:bold;">Google Meet</a>
+        <a href="https://zoom.us/" target="_blank" class="boton-enlace" style="display:block; margin:1rem auto; padding:0.8rem 2rem; background:linear-gradient(90deg,#2d8cff 0%,#fdc468 100%); color:#fff; border-radius:8px; text-decoration:none; font-weight:bold;">Zoom</a>
+        <p style="color:#fff; margin-top:1rem;">¡Propón una reunión virtual!</p>
+      </div>
+    </div>
+  </main>
+
+  
+<footer>
+    <p>© 2025 Joseph - Portafolio</p>
+  </footer>
+  </body>
+</html>

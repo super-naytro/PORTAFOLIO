@@ -1,0 +1,100 @@
+body {
+  background: #f7f9fb;
+  font-family: 'Segoe UI', Arial, sans-serif;
+  color: #222;
+
+  margin-bottom: 0.5em;
+}
+
+#popup, #popupGrupo {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 16px rgba(42,122,226,0.08);
+  padding: 2em 1.5em;
+  max-width: 350px;
+  margin: 2em auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  animation: fadeIn 0.5s;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+input, button {
+  border-radius: 8px;
+  border: 1px solid #dbeafe;
+  padding: 0.7em 1em;
+  margin-bottom: 0.7em;
+  font-size: 1em;
+  outline: none;
+  transition: box-shadow 0.2s, border-color 0.2s;
+}
+
+input:focus {
+  border-color: #2a7ae2;
+  box-shadow: 0 0 0 2px #e0e7ff;
+}
+
+button {
+  background: #2a7ae2;
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background 0.2s;
+}
+
+button:hover {
+  background: #1856a5;
+}
+
+#chat {
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 1px 8px rgba(42,122,226,0.05);
+  padding: 1em;
+  margin: 1em auto;
+  min-height: 120px;
+  max-height: 220px;
+  overflow-y: auto;
+  font-size: 1em;
+}
+
+#requestBox {
+  background: #e0e7ff;
+  border-radius: 8px;
+  padding: 1em;
+  margin: 1em auto;
+  max-width: 350px;
+  display: none;
+  animation: fadeIn 0.4s;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  background: #e0e7ff;
+}
+::-webkit-scrollbar-thumb {
+  background: #b6cdf6;
+  border-radius: 8px;
+}
+
+/* Mensajes propios y ajenos */
+#chat div {
+  margin-bottom: 0.5em;
+  padding: 0.4em 0.7em;
+  border-radius: 7px;
+  animation: fadeIn 0.3s;
+}
+#chat div[style*="color:#4caf50"] {
+  background: #eafbe7;
+  color: #256029;
+}
+#chat div:not([style*="color:#4caf50"]) {
+  background: #e0e7ff;
+  color: #2a7ae2;
+}

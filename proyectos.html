@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Proyectos - Portafolio</title>
+  <link rel="stylesheet" href="style.css">
+  
+  <header>
+    <nav>
+    <div style="display: flex; align-items: center; gap: 1rem;">
+             <img src="Imagenes/mi.jpeg" alt="Mi imagen" class="imagen-portafolio">
+        <div>
+          <h1 class="titulo-nav"><a href="curriculum.pdf" class="boton boton-cv" download style="display:block; margin-top:0.5rem; width:max-content;">Joseph padilla CV</a></h1>
+          
+        </div>
+      </div>
+      <ul style="display:flex; gap:1rem; justify-content:flex-end; align-items:center; margin:0; padding:0; list-style:none;">
+        <li><a href="index.html" >Sobre mí</a></li>
+        <li><a href="certificados.html">Certificados</a></li>
+        <li><a href="proyectos.html" class="activo">Proyectos</a></li>
+        <li><a href="contactos.html">Contacto</a></li>
+      </ul>
+      
+  </header>
+
+ 
+
+
+
+
+
+  <main>
+  <section class="mis-proyectos">
+    <h2>Mis Proyectos</h2>
+    <div class="proyectos-lista">
+      <div class="proyecto-card" data-link="proyectos/CHATp2p/CHATPTP.html" style="cursor:pointer; background:#222; border-radius:12px; box-shadow:0 2px 8px #1976d2; padding:1rem; margin-bottom:1rem; width:180px; height:180px; display:flex; align-items:center; justify-content:center;">
+        <!-- Pon aquí tu imagen del proyecto -->
+        <img src="Imagenes/CHATIMG.png" alt="Proyecto P2P" style="max-width:140px; max-height:140px; border-radius:8px; box-shadow:0 2px 8px #5e81f4; background:#ffffff;">
+      </div>
+      <!-- Puedes duplicar este div para más proyectos -->
+    </div>
+  </section>
+
+  <div id="popup-proyecto" class="popup-proyecto" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(20,20,40,0.85); z-index:1000; align-items:center; justify-content:center;">
+    <div class="popup-content" style="position:relative; background:#222; border-radius:18px; box-shadow:0 8px 32px #1976d2; padding:1.5rem; max-width:95vw; max-height:90vh; display:flex; align-items:center; justify-content:center;">
+      <span id="cerrar-popup" style="position:absolute;top:10px;right:20px;font-size:2rem;cursor:pointer;color:#fff;">&times;</span>
+      <iframe id="iframe-proyecto" src="" style="width:90vw;height:80vh;border-radius:12px;border:none;box-shadow:0 4px 18px #1976d2;"></iframe>
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const cards = document.querySelectorAll('.proyecto-card');
+      const popup = document.getElementById('popup-proyecto');
+      const iframe = document.getElementById('iframe-proyecto');
+      const cerrar = document.getElementById('cerrar-popup');
+
+      cards.forEach(card => {
+        card.addEventListener('click', () => {
+          const link = card.getAttribute('data-link');
+          if (link) {
+            iframe.src = link;
+            popup.style.display = 'flex';
+          }
+        });
+      });
+
+      cerrar.addEventListener('click', () => {
+        popup.style.display = 'none';
+        iframe.src = '';
+      });
+
+      popup.addEventListener('click', (e) => {
+        if (e.target === popup) {
+          popup.style.display = 'none';
+          iframe.src = '';
+        }
+      });
+    });
+  </script>
+  <section class="mis-proyectos">
+    
+
+   
+
+    
+
+</section>
+
+
+    
+  </main>
+
+  <footer>
+    <p>© 2025 Joseph - Portafolio</p>
+  </footer>
+</body>
+</html>
