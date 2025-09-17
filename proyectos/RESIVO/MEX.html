@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Juego de Naves P2P</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- Menú inicial -->
+  <div id="menu">
+    <h1>Juego de Naves</h1>
+    <label>Tu nombre:</label>
+    <input type="text" id="playerName" placeholder="Escribe tu nombre">
+
+    <label>Selecciona tu nave:</label>
+    <select id="shipSelect">
+      <option value="sword">Sword (fusil)</option>
+      <option value="lanza">Lanza (sniper)</option>
+      <option value="daga">Daga (subfusil)</option>
+      <option value="neon">Neon (escopeta)</option>
+      <option value="plata">Plata (cañón)</option>
+      <option value="cristal">Cristal (láser)</option>
+    </select>
+
+    <button id="startBtn">Jugar</button>
+  </div>
+
+  <!-- Juego -->
+  <canvas id="gameCanvas" width="800" height="600" style="display:none;"></canvas>
+
+  <script src="game.js"></script>
+</body>
+</html>

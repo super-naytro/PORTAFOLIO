@@ -4,20 +4,18 @@
   <meta charset="UTF-8" />
   <title>Chat P2P Individual y Grupal</title>
   <script src="https://cdn.jsdelivr.net/npm/peerjs@1.4.7/dist/peerjs.min.js"></script>
-  <link rel="stylesheet" href="demo-minimal.css" />
+  <link rel="stylesheet" href="archivos/stylo.css" />
 </head>
 <body>
 
-
-<div class="main-container">
 <div id="popup">
   <form id="loginForm">
     <h3>Ingrese usuario e ID</h3>
-    <input type="text" id="username" placeholder="Nombre de usuario" required /><br /><br />
-    <input type="text" id="userid" placeholder="ID formato x"
-      pattern="^\w{1}"
-      title="Debe tener el formato x"
-      required /><br /><br />
+    <input type="text" id="username" placeholder="Nombre de usuario" required style="width:95%" /><br /><br />
+    <input type="text" id="userid" placeholder="ID formato xxx-xxxx-xxxxx"
+      pattern="^\w{3}-\w{4}-\w{5}$"
+      title="Debe tener el formato xxx-xxxx-xxxxx"
+      required style="width:95%" /><br /><br />
     <button type="submit">Entrar</button>
   </form>
 </div>
@@ -31,48 +29,459 @@
   </div>
 </div>
 
-  <h2>Chat P2P Volátil</h2>
-  <div style="margin-bottom:1em;">Mi ID: <span id="my-id"></span></div>
+<h2>Chat P2P Volátil</h2>
+<div>Mi ID: <span id="my-id"></span></div>
 
-  <div style="width:100%;display:flex;gap:0.5em;justify-content:center;flex-wrap:wrap;">
-    <input id="connectToId" placeholder="ID a quien quieres hablar" style="flex:1;min-width:120px;max-width:180px;" />
-    <button onclick="requestConnection()">Solicitar conexión</button>
-    <button onclick="abrirPopupGrupo()">Grupo</button>
-  </div>
-
-  <div id="requestBox">
-    <p><b>Solicitud de conexión de:</b> <span id="requestFrom"></span></p>
-    <button onclick="acceptRequest()">Aceptar</button>
-    <button onclick="rejectRequest()">Rechazar</button>
-  </div>
-
-  <h4 style="margin-top:1em;">Chat con: <span id="current-peer">Nadie</span></h4>
-  <div id="chat"></div>
-  <div style="width:100%;display:flex;gap:0.5em;justify-content:center;">
-    <input id="msg" placeholder="Mensaje" style="flex:1;min-width:120px;max-width:180px;" />
-    <button onclick="send()">Enviar</button>
-  </div>
+<div>
+  <input id="connectToId" placeholder="ID a quien quieres hablar" />
+  <button onclick="requestConnection()">Solicitar conexión</button>
+  <button onclick="abrirPopupGrupo()">Grupo</button>
 </div>
 
+<div id="requestBox">
+  <p><b>Solicitud de conexión de:</b> <span id="requestFrom"></span></p>
+  <button onclick="acceptRequest()">Aceptar</button>
+  <button onclick="rejectRequest()">Rechazar</button>
+</div>
+
+<h4>Chat con: <span id="current-peer">Nadie</span></h4>
+<div id="chat"></div>
+<div>
+  <input id="msg" placeholder="Mensaje" />
+  <button onclick="send()">Enviar</button>
+  <input type="file" id="fileInput" />
+  <button onclick="sendFile()">Enviar archivo</button>
+</div>
+
+
+
+
 <script>
-// ...existing code...
-// ...existing code...
-var x1=[],x2,x3,x4,x5=false,x6=null;
-const x7=document.getElementById("chat"),x8=document.getElementById("current-peer"),x9=document.getElementById("requestBox"),x10=document.getElementById("requestFrom"),x11=new Audio('https://www.soundjay.com/buttons/sounds/button-16.mp3');
-function notificarMensaje(){x11.play().catch(()=>{});navigator.vibrate&&navigator.vibrate(100)}
-function mensajePropio(a,b){x7.innerHTML+=`<div style=\"color:#4caf50\"><b>${b}:</b> ${a}</div>`;x7.scrollTop=x7.scrollHeight}
-function recibirMensaje(a,b){x7.innerHTML+=`<div><b>${b}:</b> ${a}</div>`;notificarMensaje();x7.scrollTop=x7.scrollHeight}
-function showRequest(a,b){x6=a;x10.textContent=b;x9.style.display="block"}
-function cerrarPopupGrupo(){document.getElementById("popupGrupo").style.display="none"}
-function abrirPopupGrupo(){document.getElementById("popupGrupo").style.display="flex"}
-function acceptRequest(){if(!x6)return;x3=x6;x8.textContent=x3.peer;x7.innerHTML="";setupConnection();x3.send("__ACCEPTED__");x9.style.display="none";x6=null}
-function rejectRequest(){if(!x6)return;x6.send("__REJECTED__");x6.close();x9.style.display="none";x6=null}
-function send(){var a=document.getElementById("msg").value.trim();if(!a)return;mensajePropio(a,x4);x5?x1.forEach(b=>b.send(`${x4}: ${a}`)):x3&&x3.open?x3.send(`${x4}: ${a}`):alert("No hay conexión activa");document.getElementById("msg").value=""}
-function setupConnection(){x3.on("data",a=>{recibirMensaje(a,x3.peer)});x3.on("close",()=>{recibirMensaje("<i>Conexión cerrada</i>","");x8.textContent="Nadie";x3=null})}
-function crearGrupo(){cerrarPopupGrupo();var a=prompt("ID del grupo (XX-XX-XXX-XX):"),b=/^\w{2}-\w{2}-\w{3}-\w{2}$/;if(!b.test(a)){alert("Formato incorrecto");return}x5=true;x1=[];x2=new Peer(a);x2.on("open",c=>{document.getElementById("popup").style.display="none";document.getElementById("my-id").textContent=c;x8.textContent="Grupo "+c;x7.innerHTML="";recibirMensaje("<i>Grupo creado, esperando miembros...</i>","")});x2.on("connection",c=>{x1.push(c);c.on("data",d=>{x1.forEach(e=>{e.peer!==c.peer&&e.send(d)});recibirMensaje(d,c.peer)})})}
-function unirseGrupo(){cerrarPopupGrupo();var a=prompt("ID del grupo (XX-XX-XXX-XX):"),b=/^\w{2}-\w{2}-\w{3}-\w{2}$/;if(!b.test(a)){alert("Formato incorrecto");return}var c=x2.connect(a);c.on("open",()=>{x3=c;x8.textContent="Grupo "+a;x7.innerHTML="";recibirMensaje("<i>Conectado al grupo</i>","");c.on("data",d=>{recibirMensaje(d,"Grupo")})});c.on("error",d=>{alert("Error: "+d)})}
-function requestConnection(){var a=document.getElementById("connectToId").value.trim();if(!a)return alert("Ingresa un ID válido");x3&&(x3.close(),x7.innerHTML="",x8.textContent="Nadie");var b=x2.connect(a);b.on("open",()=>{b.send(`__REQUEST__:${x4}`)});b.on("data",c=>{if(c==="__ACCEPTED__"){x3=b;x8.textContent=a;x7.innerHTML="";setupConnection()}else if(c==="__REJECTED__"){alert("Solicitud rechazada");b.close()}else if(c==="__BUSY__"){alert("El usuario está ocupado");b.close()}});b.on("error",c=>{alert("Error: "+c)})}
-document.getElementById("loginForm").onsubmit=a=>{a.preventDefault();x4=document.getElementById("username").value.trim();var b=document.getElementById("userid").value.trim(),c=/^\w{1}$/;if(!c.test(b)){alert("El ID debe tener el formato x");return}x2=new Peer(b);x2.on("open",d=>{document.getElementById("popup").style.display="none";document.getElementById("my-id").textContent=d});x2.on("error",d=>{if(d.type==="unavailable-id"){alert("El ID ya está en uso.");document.getElementById("popup").style.display="flex"}else alert("Error: "+d)});x2.on("connection",d=>{if(x5){x1.push(d);d.on("data",e=>{x1.forEach(f=>{f.peer!==d.peer&&f.send(e)});recibirMensaje(e,d.peer)})}else{if(x3){d.on("open",()=>{d.send("__BUSY__");d.close()});return}d.on("data",e=>{e.startsWith("__REQUEST__")&&(showRequest(d,e.split(":")[1]))})}})}
+// Variables globales
+let peer, conn;
+let username;
+let esAnfitrion = false;
+let grupoPeers = [];
+let conocidos = [];
+let listeners = [];
+// Claves para cifrado extremo a extremo
+let clavesPropias;
+let clavePublicaRemota;
+let claveSimetrica;
+
+// Utilidades para cifrado
+function arrayBufferToBase64(buffer) {
+  let binary = '';
+  let bytes = new Uint8Array(buffer);
+  let len = bytes.byteLength;
+  for (let i = 0; i < len; i++) {
+    binary += String.fromCharCode(bytes[i]);
+  }
+  return btoa(binary);
+}
+
+function base64ToArrayBuffer(base64) {
+  let binary = atob(base64);
+  let len = binary.length;
+  let bytes = new Uint8Array(len);
+  for (let i = 0; i < len; i++) {
+    bytes[i] = binary.charCodeAt(i);
+  }
+  return bytes.buffer;
+}
+
+async function generarParDeClaves() {
+  return await crypto.subtle.generateKey(
+    {
+      name: "RSA-OAEP",
+      modulusLength: 2048,
+      publicExponent: new Uint8Array([1, 0, 1]),
+      hash: "SHA-256"
+    },
+    true,
+    ["encrypt", "decrypt"]
+  );
+}
+
+(async () => {
+  clavesPropias = await generarParDeClaves();
+})();
+
+const chat = document.getElementById("chat");
+const currentPeer = document.getElementById("current-peer");
+const requestBox = document.getElementById("requestBox");
+const requestFromSpan = document.getElementById("requestFrom");
+
+// Sonido para mensajes
+const beep = new Audio('https://www.soundjay.com/buttons/sounds/button-16.mp3');
+
+// Notificación de mensaje
+function notificarMensaje() {
+  beep.play().catch(() => {});
+  if (navigator.vibrate) navigator.vibrate(100);
+}
+
+// Mensaje recibido (JSON)
+function recibirMensaje(obj) {
+  if (obj.tipo === "msg") {
+    chat.innerHTML += `<div class="bubble-left"><b>${obj.de}:</b> ${obj.texto}</div>`;
+    notificarMensaje();
+    chat.scrollTop = chat.scrollHeight;
+  }
+}
+
+// Mensaje propio (JSON)
+function mensajePropio(texto, nombre) {
+  chat.innerHTML += `<div class="bubble-right"><b>${nombre}:</b> ${texto}</div>`;
+  chat.scrollTop = chat.scrollHeight;
+}
+
+// Mostrar archivo enviado (propio)
+function mensajePropioArchivo(nombreArchivo, base64) {
+  const archivoHtml = `
+    <div class="bubble-right">
+      <b>📎 ${nombreArchivo}</b><br>
+      <button onclick="descargarBase64('${base64}', '${nombreArchivo}')">Descargar</button>
+    </div>`;
+  chat.innerHTML += archivoHtml;
+  chat.scrollTop = chat.scrollHeight;
+}
+
+// Mostrar archivo recibido
+function mensajeRecibidoArchivo(nombreArchivo, base64) {
+  const archivoHtml = `
+    <div class="bubble-left">
+      <b>📎 ${nombreArchivo}</b><br>
+      <button onclick="descargarBase64('${base64}', '${nombreArchivo}')">Descargar</button>
+    </div>`;
+  chat.innerHTML += archivoHtml;
+  chat.scrollTop = chat.scrollHeight;
+  notificarMensaje();
+}
+
+// Descargar archivo desde Base64
+function descargarBase64(base64, nombre) {
+  const binario = atob(base64);
+  const arreglo = new Uint8Array(binario.length);
+  for (let i = 0; i < binario.length; i++) {
+    arreglo[i] = binario.charCodeAt(i);
+  }
+  const blob = new Blob([arreglo], { type: "application/octet-stream" });
+  const url = URL.createObjectURL(blob);
+  const enlace = document.createElement("a");
+  enlace.href = url;
+  enlace.download = nombre;
+  document.body.appendChild(enlace);
+  enlace.click();
+  enlace.remove();
+}
+
+// Enviar archivo
+function sendFile() {
+  const file = document.getElementById("fileInput").files[0];
+  if (!file) {
+    alert("Selecciona un archivo primero.");
+    return;
+  }
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    const base64 = e.target.result.split(",")[1]; // solo el base64
+    const paquete = JSON.stringify({
+      tipo: "archivo",
+      nombre: file.name,
+      contenido: base64
+    });
+    mensajePropioArchivo(file.name, base64);
+    if (esAnfitrion) {
+      grupoPeers.forEach(p => p.send(paquete));
+    } else if (conn && conn.open) {
+      conn.send(paquete);
+    }
+  };
+  reader.readAsDataURL(file);
+  document.getElementById("fileInput").value = "";
+}
+
+// Mostrar solicitud de conexión
+let pendingConn = null;
+function showRequest(connection, fromUser) {
+  pendingConn = connection;
+  requestFromSpan.textContent = fromUser;
+  requestBox.style.display = "block";
+}
+
+// Pregunta anti-spam
+// Todas las solicitudes mostrarán el requestBox
+function preguntarAntiSpam(user) {
+  return true;
+}
+
+// Aceptar solicitud
+function acceptRequest() {
+  if (!pendingConn) return;
+  conn = pendingConn;
+  currentPeer.textContent = conn.peer;
+  chat.innerHTML = "";
+  setupConnection();
+  conn.send(JSON.stringify({ tipo: "accept" }));
+  requestBox.style.display = "none";
+  pendingConn = null;
+}
+
+// Rechazar solicitud
+function rejectRequest() {
+  if (!pendingConn) return;
+  pendingConn.send(JSON.stringify({ tipo: "reject" }));
+  pendingConn.close();
+  requestBox.style.display = "none";
+  pendingConn = null;
+}
+
+// Enviar mensaje
+function send() {
+  const message = document.getElementById("msg").value.trim();
+  if (!message) return;
+  mensajePropio(message, username);
+  const obj = { tipo: "msg", de: username, texto: message };
+  if (esAnfitrion) {
+    grupoPeers.forEach(p => p.send(JSON.stringify(obj)));
+  } else if (conn && conn.open) {
+    conn.send(JSON.stringify(obj));
+  } else {
+    alert("No hay conexión activa");
+  }
+  document.getElementById("msg").value = "";
+}
+
+// Iniciar sesión
+document.getElementById("loginForm").onsubmit = (e) => {
+  e.preventDefault();
+  username = document.getElementById("username").value.trim();
+  const userid = document.getElementById("userid").value.trim();
+  const idFormat = /^\w{3}-\w{4}-\w{5}$/;
+  if (!idFormat.test(userid)) {
+    alert("El ID debe tener el formato xxx-xxxx-xxxxx");
+    return;
+  }
+  peer = new Peer(userid);
+  peer.on("open", (id) => {
+    document.getElementById("popup").style.display = "none";
+    document.getElementById("my-id").textContent = id;
+  });
+  peer.on("error", (err) => {
+    if (err.type === "unavailable-id") {
+      alert("El ID ya está en uso.");
+      document.getElementById("popup").style.display = "flex";
+    } else {
+      alert("Error: " + err);
+    }
+  });
+  peer.on("connection", (incomingConn) => {
+    if (esAnfitrion) {
+      grupoPeers.push(incomingConn);
+      incomingConn.on("data", (data) => {
+        let obj;
+        try { obj = JSON.parse(data); } catch { return; }
+        grupoPeers.forEach(p => {
+          if (p.peer !== incomingConn.peer) {
+            p.send(data);
+          }
+        });
+        recibirMensaje(obj);
+      });
+    } else {
+      if (conn) {
+        incomingConn.on("open", () => {
+          incomingConn.send(JSON.stringify({ tipo: "busy" }));
+          incomingConn.close();
+        });
+        return;
+      }
+      incomingConn.on("data", (data) => {
+        let obj;
+        try { obj = JSON.parse(data); } catch { return; }
+        if (obj.tipo === "request" && preguntarAntiSpam(obj.de)) {
+          showRequest(incomingConn, obj.de);
+        }
+      });
+    }
+  });
+};
+
+// Solicitar conexión
+function requestConnection() {
+  const destId = document.getElementById("connectToId").value.trim();
+  if (!destId) return alert("Ingresa un ID válido");
+  if (conn) {
+    cerrarConexion();
+  }
+  const connection = peer.connect(destId);
+  connection.on("open", () => {
+    connection.send(JSON.stringify({ tipo: "request", de: username }));
+  });
+  connection.on("data", (data) => {
+    let obj;
+    try { obj = JSON.parse(data); } catch { return; }
+    if (obj.tipo === "accept") {
+      conn = connection;
+      currentPeer.textContent = destId;
+      chat.innerHTML = "";
+      setupConnection();
+    } else if (obj.tipo === "reject") {
+      alert("Solicitud rechazada");
+      connection.close();
+    } else if (obj.tipo === "busy") {
+      alert("El usuario está ocupado");
+      connection.close();
+    }
+  });
+  connection.on("error", (err) => {
+    alert("Error: " + err);
+  });
+}
+
+// Configurar conexión
+function setupConnection() {
+  listeners.forEach(l => l());
+  listeners = [];
+  const onData = (data) => {
+    let obj;
+    try { obj = JSON.parse(data); } catch { obj = data; }
+    if (obj.tipo === "archivo") {
+      mensajeRecibidoArchivo(obj.nombre, obj.contenido);
+      return;
+    }
+    if (typeof obj === "object" && obj.tipo === "msg") {
+      recibirMensaje(obj);
+    }
+  };
+  conn.on("data", onData);
+  listeners.push(() => conn.off("data", onData));
+  const onClose = () => {
+    chat.innerHTML += `<div class="bubble-left"><i>Conexión cerrada</i></div>`;
+    currentPeer.textContent = "Nadie";
+    conn = null;
+    listeners.forEach(l => l());
+    listeners = [];
+  };
+  conn.on("close", onClose);
+  listeners.push(() => conn.off("close", onClose));
+}
+
+function cerrarConexion() {
+  if (conn) {
+    conn.close();
+    conn = null;
+    listeners.forEach(l => l());
+    listeners = [];
+    chat.innerHTML = "";
+    currentPeer.textContent = "Nadie";
+  }
+}
+
+// Grupo
+function abrirPopupGrupo() {
+  document.getElementById("popupGrupo").style.display = "flex";
+}
+
+function cerrarPopupGrupo() {
+  document.getElementById("popupGrupo").style.display = "none";
+}
+
+function crearGrupo() {
+  cerrarPopupGrupo();
+  const groupId = prompt("ID del grupo (XX-XX-XXX-XX):");
+  const idFormat = /^\w{2}-\w{2}-\w{3}-\w{2}$/;
+  if (!idFormat.test(groupId)) {
+    alert("Formato incorrecto");
+    return;
+  }
+  esAnfitrion = true;
+  grupoPeers = [];
+  peer = new Peer(groupId);
+  peer.on("open", (id) => {
+    document.getElementById("popup").style.display = "none";
+    document.getElementById("my-id").textContent = id;
+    currentPeer.textContent = "Grupo " + id;
+    chat.innerHTML = "";
+    chat.innerHTML += `<div class="bubble-left"><i>Grupo creado, esperando miembros...</i></div>`;
+  });
+  peer.on("connection", (incomingConn) => {
+    grupoPeers.push(incomingConn);
+    incomingConn.on("data", (data) => {
+      let obj;
+      try { obj = JSON.parse(data); } catch { return; }
+      grupoPeers.forEach(p => {
+        if (p.peer !== incomingConn.peer) {
+          p.send(data);
+        }
+      });
+      recibirMensaje(obj);
+    });
+  });
+}
+
+function unirseGrupo() {
+  cerrarPopupGrupo();
+  const groupId = prompt("ID del grupo (XX-XX-XXX-XX):");
+  const idFormat = /^\w{2}-\w{2}-\w{3}-\w{2}$/;
+  if (!idFormat.test(groupId)) {
+    alert("Formato incorrecto");
+    return;
+  }
+  const connection = peer.connect(groupId);
+  connection.on("open", () => {
+    conn = connection;
+    currentPeer.textContent = "Grupo " + groupId;
+    chat.innerHTML = "";
+    chat.innerHTML += `<div class="bubble-left"><i>Conectado al grupo</i></div>`;
+    connection.on("data", (data) => {
+      let obj;
+      try { obj = JSON.parse(data); } catch { return; }
+      recibirMensaje(obj);
+    });
+  });
+  connection.on("error", (err) => {
+    alert("Error: " + err);
+  });
+}
+
+// Estilos burbuja y chat
+const style = document.createElement('style');
+style.innerHTML = `
+#chat {
+  background: #111;
+  color: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+  padding: 10px;
+  min-height: 180px;
+  max-height: 320px;
+  overflow-y: auto;
+  margin-bottom: 10px;
+}
+.bubble-left {
+  background: #2196f3;
+  color: #fff;
+  border-radius: 10px;
+  margin: 4px 0;
+  padding: 6px 12px;
+  max-width: 70%;
+  text-align: left;
+  word-break: break-word;
+}
+.bubble-right {
+  background: #ffe082;
+  color: #222;
+  border-radius: 10px;
+  margin: 4px 0 4px auto;
+  padding: 6px 12px;
+  max-width: 70%;
+  text-align: right;
+  word-break: break-word;
+}
+`;
+document.head.appendChild(style);
 </script>
 
 </body>

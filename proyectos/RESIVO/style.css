@@ -1,0 +1,36 @@
+body {
+  margin: 0;
+  background: #000;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  color: white;
+  font-family: sans-serif;
+  flex-direction: column;
+}
+
+#menu {
+  background: #111;
+  padding: 20px;
+  border: 2px solid #0ff;
+  border-radius: 10px;
+  text-align: center;
+}
+
+#menu input, #menu select, #menu button {
+  margin: 10px;
+  padding: 8px;
+}
+
+canvas {
+  border: 2px solid #00f;
+  background: #111;
+}
+canvas {
+  border: 2px solid #00f;
+  background: #111;
+  width: 100vw;
+  height: 100vh;
+  display: block;
+}

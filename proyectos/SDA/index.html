@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sistema de Asistencia QR</title>
+<script src="https://cdn.jsdelivr.net/npm/qrious@4.0.2/dist/qrious.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jsqr/dist/jsQR.js"></script>
+<style>
+  body { font-family: Arial, sans-serif; margin:0; padding:0; background: #f0f4f8; display:flex; justify-content:center; align-items:center; min-height:100vh; }
+  .container { width: 95%; max-width: 480px; background: #fff; border-radius: 12px; padding:20px; box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
+  h1 { text-align:center; margin-bottom:20px; }
+  .menu { display:flex; justify-content: space-between; gap:10px; margin-bottom:20px; }
+  .menu div { flex:1; background:#4CAF50; color:#fff; padding:20px; border-radius:10px; text-align:center; font-weight:bold; cursor:pointer; transition:0.3s; }
+  .menu div:hover { background:#45a049; }
+  .hidden { display:none; }
+  input, button { width: 100%; padding:10px; margin:10px 0; border-radius:6px; border:1px solid #ccc; }
+  button { background:#2196F3; color:#fff; border:none; cursor:pointer; transition:0.3s; }
+  button:hover { background:#1976D2; }
+  #cameraScanBtn {
+    background: linear-gradient(90deg,#43a047 0%,#00bcd4 100%);
+    color: #fff;
+    font-weight: bold;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px #43a04744;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.08rem;
+    border: none;
+    margin-bottom: 8px;
+    gap: 8px;
+  }
+  #cameraScanBtn:hover {
+    background: linear-gradient(90deg,#388e3c 0%,#0097a7 100%);
+    box-shadow: 0 4px 12px #43a04766;
+  }
+  canvas { display:block; margin:20px auto; }
+  @media(max-width:480px){ .menu { flex-direction: column; } }
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>Sistema de Asistencia QR</h1>
+
+  <!-- MENU PRINCIPAL -->
+  <div id="menu" class="menu">
+    <div onclick="showCreate()">Crear Evento</div>
+    <div onclick="showAttend()">Asistir</div>
+  </div>
+
+  <!-- CREAR EVENTO -->
+  <div id="createEvent" class="hidden">
+    <h3>Crear Evento</h3>
+    <input type="text" id="eventName" placeholder="Nombre del evento">
+    <input type="time" id="startTime">
+    <input type="time" id="endTime">
+    <button onclick="generateQR()">Generar QR</button>
+    <canvas id="qrCode"></canvas>
+    <button onclick="printQR()" style="display:block;margin:1rem auto;padding:0.7rem 2rem;background:linear-gradient(90deg,#1976d2 0%,#8e24aa 100%);color:#fff;font-weight:bold;border-radius:8px;border:none;box-shadow:0 2px 8px #1976d2;cursor:pointer;">Imprimir QR</button>
+    <button onclick="downloadTxt()">Descargar asistencia (Solo anfitrión)</button>
+    <button onclick="goMenu()">Volver</button>
+  </div>
+
+  <!-- ASISTIR -->
+  <div id="attendEvent" class="hidden">
+    <h3>Marcar Asistencia</h3>
+    <input type="text" id="userName" placeholder="Tu nombre o ID">
+    <button onclick="scanQRCode()">Escanear QR (manual)</button>
+    <button onclick="openCameraScan()" id="cameraScanBtn">
+      <span style="vertical-align:middle;display:inline-block;margin-right:8px;">
+        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="7" width="18" height="13" rx="2" ry="2"/><path d="M16 3l-4 4-4-4"/></svg>
+      </span>
+      Escanear QR con cámara
+    </button>
+    <button onclick="viewAttendance()" id="viewAttendanceBtn">Ver asistencia</button>
+    <div id="attendanceList"></div>
+    <button onclick="goMenu()">Volver</button>
+  </div>
+</div>
+
+<script>
+let attendanceRecords = [];
+let eventData = null;
+
+// MENU
+function showCreate(){ document.getElementById('menu').classList.add('hidden'); document.getElementById('createEvent').classList.remove('hidden'); }
+function showAttend(){ document.getElementById('menu').classList.add('hidden'); document.getElementById('attendEvent').classList.remove('hidden'); }
+function goMenu(){ document.getElementById('createEvent').classList.add('hidden'); document.getElementById('attendEvent').classList.add('hidden'); document.getElementById('menu').classList.remove('hidden'); }
+
+// CONVERTIR HH:MM A MINUTOS
+function timeToMinutes(hhmm){ const [h,m] = hhmm.split(':').map(Number); return h*60 + m; }
+
+// GENERAR QR
+function generateQR(){
+  const name = document.getElementById('eventName').value.trim();
+  const start = document.getElementById('startTime').value;
+  const end = document.getElementById('endTime').value;
+  if(!name || !start || !end){ alert('Completa todos los campos'); return; }
+
+  eventData = { name, start, end };
+  new QRious({ element: document.getElementById('qrCode'), value: JSON.stringify(eventData), size:200 });
+  alert('QR generado. Solo válido 15 min antes y hasta 30 min antes de terminar.');
+}
+
+// IMPRIMIR QR
+function printQR() {
+  const qrCanvas = document.getElementById('qrCode');
+  if(!qrCanvas) { alert('No hay QR generado'); return; }
+  const dataUrl = qrCanvas.toDataURL();
+  const printWindow = window.open('', '_blank');
+  printWindow.document.write(`
+    <html>
+    <head><title>Imprimir QR</title></head>
+    <body style="text-align:center;">
+      <h2>QR del Evento</h2>
+      <img src="${dataUrl}" style="width:250px;height:250px;">
+      <p>Escanea este código para marcar asistencia</p>
+    </body>
+    </html>
+  `);
+  printWindow.document.close();
+  printWindow.focus();
+  printWindow.print();
+  printWindow.close();
+}
+
+// ESCANEO MANUAL
+function scanQRCode(){
+  if(!eventData){ alert('No hay QR generado'); return; }
+  const user = document.getElementById('userName').value.trim();
+  if(!user){ alert('Ingresa tu nombre/ID'); return; }
+  const mac = 'MAC-' + Math.floor(Math.random()*1e6).toString(16);
+  const now = new Date();
+  const currentMinutes = now.getHours()*60 + now.getMinutes();
+  const startMinutes = timeToMinutes(eventData.start)-15;
+  const endMinutes = timeToMinutes(eventData.end)-30;
+  let record = attendanceRecords.find(r=>r.user===user);
+  if(!record) record = { user, entrada:null, salida:null, mac, nameEvent:eventData.name, date:now.toLocaleDateString() };
+  if(!record.entrada && currentMinutes >= startMinutes){
+    record.entrada = now.toLocaleTimeString();
+    alert('Entrada registrada');
+  } else if(!record.salida && currentMinutes >= endMinutes){
+    record.salida = now.toLocaleTimeString();
+    alert('Salida registrada');
+  } else { alert('No puedes marcar aún o ya registraste ambos'); return; }
+  if(!attendanceRecords.includes(record)) attendanceRecords.push(record);
+}
+
+// DESCARGAR TXT
+function downloadTxt(){
+  if(attendanceRecords.length===0){ alert('No hay registros'); return; }
+  let txtContent = 'Evento\tFecha\tUsuario\tMAC\tEntrada\tSalida\n';
+  attendanceRecords.forEach(r=>{ txtContent+=`${r.nameEvent}\t${r.date}\t${r.user}\t${r.mac}\t${r.entrada||''}\t${r.salida||''}\n`; });
+  const blob = new Blob([txtContent], {type:'text/plain'});
+  const link = document.createElement('a');
+  link.download = 'asistencia.txt';
+  link.href = URL.createObjectURL(blob);
+  link.click();
+}
+
+// ESCANEO CÁMARA
+function openCameraScan() {
+  const modal = document.createElement('div');
+  modal.style.position = 'fixed';
+  modal.style.top = '0';
+  modal.style.left = '0';
+  modal.style.width = '100vw';
+  modal.style.height = '100vh';
+  modal.style.background = 'rgba(0,0,0,0.8)';
+  modal.style.display = 'flex';
+  modal.style.flexDirection = 'column';
+  modal.style.justifyContent = 'center';
+  modal.style.alignItems = 'center';
+  modal.style.zIndex = '9999';
+  modal.innerHTML = `
+    <div style="background:#fff;padding:20px;border-radius:12px;box-shadow:0 2px 8px #333;max-width:350px;text-align:center;">
+      <h3>Escanear QR con cámara</h3>
+      <video id="qrVideo" style="width:300px;height:220px;border-radius:8px;background:#222;" autoplay></video>
+      <canvas id="qrCanvas" style="display:none;"></canvas>
+      <br>
+      <button id="closeCamBtn" style="margin-top:10px;background:#d32f2f;">Cerrar</button>
+      <div id="qrResult" style="margin-top:10px;color:#388e3c;font-weight:bold;"></div>
+    </div>
+  `;
+  document.body.appendChild(modal);
+
+  const video = modal.querySelector('#qrVideo');
+  const canvas = modal.querySelector('#qrCanvas');
+  const qrResult = modal.querySelector('#qrResult');
+  let stream;
+  let scanInterval;
+
+  modal.querySelector('#closeCamBtn').onclick = function() {
+    if(stream) stream.getTracks().forEach(t=>t.stop());
+    clearInterval(scanInterval);
+    modal.remove();
+  };
+
+  navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } })
+    .then(function(s) {
+      stream = s;
+      video.srcObject = stream;
+      video.setAttribute('playsinline', true);
+      video.play();
+      scanInterval = setInterval(function() {
+        if(video.readyState === video.HAVE_ENOUGH_DATA) {
+          canvas.width = video.videoWidth;
+          canvas.height = video.videoHeight;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+          const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+          const code = jsQR(imageData.data, canvas.width, canvas.height);
+          if(code) {
+            qrResult.textContent = 'QR detectado';
+            markAttendanceFromQR(code.data);
+            clearInterval(scanInterval);
+            setTimeout(()=>{ if(stream) stream.getTracks().forEach(t=>t.stop()); modal.remove(); }, 1200);
+          }
+        }
+      }, 500);
+    })
+    .catch(function(err) {
+      qrResult.textContent = 'No se pudo acceder a la cámara';
+    });
+}
+
+// PROCESAR QR
+function markAttendanceFromQR(qrData) {
+  let event;
+  try { event = JSON.parse(qrData); } catch(e) { alert('QR inválido'); return; }
+  if(!event || !event.name || !event.start || !event.end) { alert('QR de evento inválido'); return; }
+  eventData = event;
+  const user = document.getElementById('userName').value.trim();
+  if(!user){ alert('Ingresa tu nombre/ID antes de escanear'); return; }
+  const mac = 'MAC-' + Math.floor(Math.random()*1e6).toString(16);
+  const now = new Date();
+  const currentMinutes = now.getHours()*60 + now.getMinutes();
+  const startMinutes = timeToMinutes(eventData.start)-15;
+  const endMinutes = timeToMinutes(eventData.end)-30;
+  let record = attendanceRecords.find(r=>r.user===user);
+  if(!record) record = { user, entrada:null, salida:null, mac, nameEvent:eventData.name, date:now.toLocaleDateString() };
+  if(!record.entrada && currentMinutes >= startMinutes){
+    record.entrada = now.toLocaleTimeString();
+    alert('Entrada registrada por QR');
+  } else if(!record.salida && currentMinutes >= endMinutes){
+    record.salida = now.toLocaleTimeString();
+    alert('Salida registrada por QR');
+  } else { alert('No puedes marcar aún o ya registraste ambos'); return; }
+  if(!attendanceRecords.includes(record)) attendanceRecords.push(record);
+}
+
+// VER ASISTENCIA
+function viewAttendance(){
+  const listDiv = document.getElementById('attendanceList');
+  if(attendanceRecords.length===0){
+    listDiv.innerHTML = '<h4>Asistencia actual:</h4><p style="color:#d32f2f;font-weight:bold;">No hay participantes o registros.</p>';
+    return;
+  }
+  listDiv.innerHTML = '<h4>Asistencia actual:</h4>';
+  attendanceRecords.forEach(r=>{
+    listDiv.innerHTML += `<p>${r.user} - Entrada: ${r.entrada||'-'} | Salida: ${r.salida||'-'}</p>`;
+  });
+  // Botón para descargar asistencia
+  listDiv.innerHTML += '<button onclick="downloadTxt()" style="margin-top:10px;background:linear-gradient(90deg,#1976d2 0%,#8e24aa 100%);color:#fff;font-weight:bold;border-radius:8px;border:none;box-shadow:0 2px 8px #1976d2;cursor:pointer;">Descargar asistencia</button>';
+}
+</script>
+</body>
+</html>

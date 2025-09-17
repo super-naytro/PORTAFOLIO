@@ -174,6 +174,33 @@
       <li>Más resiliencia: si un servidor cae, la red sigue funcionando.</li>
     </ul>
   </section>
+    <section id="funcionamiento-real">
+      <h2>¿Cómo funciona realmente?</h2>
+      <p>
+        La comunicación entre usuarios se da en un modelo <strong>P2P (peer-to-peer)</strong>, 
+        es decir, los datos viajan directamente entre navegadores sin pasar por un servidor central 
+        que actúe como intermediario.
+      </p>
+
+      <p>
+        Sin embargo, para que dos navegadores puedan encontrarse en internet y establecer la conexión,
+        se utiliza un <strong>servidor de señalización</strong> (por defecto, el servidor de <em>PeerJS</em>).  
+        Este servidor <strong>no almacena ni transporta los mensajes</strong>, únicamente ayuda a 
+        “presentar” a los usuarios entre sí.
+      </p>
+
+      <p>
+        Una vez establecida la conexión, toda la información fluye de manera directa y encriptada entre los clientes.
+        Además, es posible configurar tu <strong>servidor propio de señalización</strong> para tener mayor 
+        privacidad y control sobre quién puede unirse.
+      </p>
+
+      <ul>
+        <li>No depende de un servidor central para el envío de mensajes.</li>
+        <li>El servidor solo sirve para iniciar la conexión, no para mantenerla.</li>
+        <li>Con un servidor personal de señalización, se puede privatizar el sistema aún más.</li>
+      </ul>
+    </section>
 
   <section id="ventajas">
     <h2>¿Qué lo hace diferente?</h2>
@@ -184,16 +211,7 @@
     </p>
   </section>
 
-  <section id="video-presentacion">
-    <h2>Versión Definitiva del Proyecto P2P</h2>
-    <p>En este video puedes ver el funcionamiento completo del proyecto, sus capacidades y usos.</p>
-    <div class="video-container">
-      <video controls poster="preview.jpg">
-        <source src="demo-final.mp4" type="video/mp4">
-        Tu navegador no soporta la reproducción de video.
-      </video>
-    </div>
-  </section>
+ 
 
   <section id="probar">
     <div style="text-align:center;">
