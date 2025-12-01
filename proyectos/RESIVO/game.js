@@ -40,6 +40,10 @@ player.maxTurbo = 100; // capacidad máxima de energia turbo
 player.turboEnergy = 100; // energía actual
 player.turboDrain = 1; // cuánto consume por tick mientras turbo activo
 player.turboRegen = 0.5; // cuánto se recupera por tick cuando no está activo
+// Bloqueo tras agotarse el turbo
+player.turboBlocked = false; // true mientras esté en tiempo de espera antes de regenerar
+player.turboBlockTimer = 0; // contador de frames restantes del bloqueo
+player.turboBlockDuration = 300; // duración del bloqueo en frames (~5s a 60fps)
 
 // --- Enemigos ---
 let enemies = [];
@@ -66,7 +70,14 @@ const enemyTypes = [
 window.addEventListener("keydown", e => {
   keys[e.key] = true;
   // Detectar la tecla ESPACIO (soporta `e.key === ' '` y `e.code === 'Space'`)
-  if (e.key === " " || e.code === "Space") player.turbo = true;
+  if (e.key === " " || e.code === "Space") {
+    // Sólo activar turbo si hay energía y no está bloqueado
+    if (player.turboEnergy > 0 && !player.turboBlocked) {
+      player.turbo = true;
+    } else {
+      player.turbo = false;
+    }
+  }
 });
 
 window.addEventListener("keyup", e => {
@@ -188,14 +199,29 @@ function update() {
 
   // --- Turbo y velocidad actual ---
   let currentSpeed = player.speed;
-  if (player.turbo && player.turboEnergy > 0) {
+  if (player.turbo && player.turboEnergy > 0 && !player.turboBlocked) {
     currentSpeed = player.speed * 2.2; // multiplicador de turbo (ajustable)
     player.turboEnergy -= player.turboDrain;
-    if (player.turboEnergy < 0) player.turboEnergy = 0;
+    if (player.turboEnergy <= 0) {
+      // Cuando se agota, cortar el turbo y activar bloqueo antes de regenerar
+      player.turboEnergy = 0;
+      player.turbo = false;
+      player.turboBlocked = true;
+      player.turboBlockTimer = player.turboBlockDuration;
+    }
   } else {
-    // Recuperar energía cuando NO usas turbo
-    player.turboEnergy += player.turboRegen;
-    if (player.turboEnergy > player.maxTurbo) player.turboEnergy = player.maxTurbo;
+    // Si está en bloqueo, decrementar timer; sólo regenerar cuando NO esté bloqueado
+    if (player.turboBlocked) {
+      player.turboBlockTimer--;
+      if (player.turboBlockTimer <= 0) {
+        player.turboBlockTimer = 0;
+        player.turboBlocked = false;
+      }
+    } else {
+      // Recuperar energía cuando NO usas turbo y no está bloqueado
+      player.turboEnergy += player.turboRegen;
+      if (player.turboEnergy > player.maxTurbo) player.turboEnergy = player.maxTurbo;
+    }
   }
   // Aplicar multiplicador global de velocidad si existe
   if (player.speedMultiplier) currentSpeed *= player.speedMultiplier;
