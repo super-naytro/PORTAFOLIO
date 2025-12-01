@@ -19,6 +19,27 @@ const player = {
   maxHealth: 100,
   damage: 10
 };
+// Nuevas variables del jugador añadidas abajo
+// (valores por defecto; se pueden ajustar según sea necesario)
+player.score = 0;
+player.level = 1;
+player.xp = 0;
+player.armor = 0; // reduce daño recibido (valor plano)
+player.shield = 0; // escudo adicional que absorbe daño antes de la vida
+player.coins = 0; // moneda del juego
+player.lives = 3;
+player.invulnerable = false;
+player.invulnTimer = 0; // frames o ticks que quedan de invulnerabilidad
+player.speedMultiplier = 1; // multiplicador para velocidad (buffs/debuffs)
+player.critChance = 0.05; // probabilidad de golpe crítico (5%)
+player.fireRateModifier = 1; // modifica la cadencia de disparo
+player.ammo = Infinity; // cantidad de munición (si aplica)
+player.turbo = false; // true mientras se mantenga la tecla ESPACIO
+// Configuración de energía de turbo
+player.maxTurbo = 100; // capacidad máxima de energia turbo
+player.turboEnergy = 100; // energía actual
+player.turboDrain = 1; // cuánto consume por tick mientras turbo activo
+player.turboRegen = 0.5; // cuánto se recupera por tick cuando no está activo
 
 // --- Enemigos ---
 let enemies = [];
@@ -41,9 +62,17 @@ const enemyTypes = [
   { color: "maroon", health: 80, speed: 1 }
 ];
 
-// Eventos teclado
-window.addEventListener("keydown", e => keys[e.key] = true);
-window.addEventListener("keyup", e => keys[e.key] = false);
+// Eventos teclado (ahora detecta ESPACIO para `player.turbo`)
+window.addEventListener("keydown", e => {
+  keys[e.key] = true;
+  // Detectar la tecla ESPACIO (soporta `e.key === ' '` y `e.code === 'Space'`)
+  if (e.key === " " || e.code === "Space") player.turbo = true;
+});
+
+window.addEventListener("keyup", e => {
+  keys[e.key] = false;
+  if (e.key === " " || e.code === "Space") player.turbo = false;
+});
 
 // Eventos mouse
 canvas.addEventListener("mousemove", e => {
@@ -157,11 +186,25 @@ function spawnEnemy() {
 function update() {
   if (!gameStarted) return;
 
-  // Movimiento jugador
-  if (keys["w"] || keys["ArrowUp"]) player.y -= player.speed;
-  if (keys["s"] || keys["ArrowDown"]) player.y += player.speed;
-  if (keys["a"] || keys["ArrowLeft"]) player.x -= player.speed;
-  if (keys["d"] || keys["ArrowRight"]) player.x += player.speed;
+  // --- Turbo y velocidad actual ---
+  let currentSpeed = player.speed;
+  if (player.turbo && player.turboEnergy > 0) {
+    currentSpeed = player.speed * 2.2; // multiplicador de turbo (ajustable)
+    player.turboEnergy -= player.turboDrain;
+    if (player.turboEnergy < 0) player.turboEnergy = 0;
+  } else {
+    // Recuperar energía cuando NO usas turbo
+    player.turboEnergy += player.turboRegen;
+    if (player.turboEnergy > player.maxTurbo) player.turboEnergy = player.maxTurbo;
+  }
+  // Aplicar multiplicador global de velocidad si existe
+  if (player.speedMultiplier) currentSpeed *= player.speedMultiplier;
+
+  // Movimiento jugador usando `currentSpeed`
+  if (keys["w"] || keys["ArrowUp"]) player.y -= currentSpeed;
+  if (keys["s"] || keys["ArrowDown"]) player.y += currentSpeed;
+  if (keys["a"] || keys["ArrowLeft"]) player.x -= currentSpeed;
+  if (keys["d"] || keys["ArrowRight"]) player.x += currentSpeed;
 
   // Limitar al canvas
   player.x = Math.max(player.size / 2, Math.min(canvas.width - player.size / 2, player.x));
@@ -228,6 +271,18 @@ function draw() {
   ctx.fillRect(player.x - 20, player.y + player.size, 40, 5);
   ctx.fillStyle = "lime";
   ctx.fillRect(player.x - 20, player.y + player.size, 40 * (player.health / player.maxHealth), 5);
+
+  // 4. Barra de energía TURBO
+  ctx.fillStyle = "darkblue";
+  ctx.fillRect(player.x - 20, player.y + player.size + 10, 40, 5);
+
+  ctx.fillStyle = "cyan";
+  ctx.fillRect(
+    player.x - 20,
+    player.y + player.size + 10,
+    40 * (player.turboEnergy / player.maxTurbo),
+    5
+  );
 
   // Balas
   ctx.fillStyle = "yellow";
