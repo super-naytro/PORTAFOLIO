@@ -1,0 +1,331 @@
+body {
+    margin: 0;
+    overflow: hidden;
+    background: #000;
+}
+
+#Engien {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+}
+
+#arena {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+}
+
+#player {
+    position: absolute;
+    background-size: cover;
+    transform-origin: center;
+}
+
+#arma {
+    background-size: cover;
+    transform-origin: center;
+}
+/* --- HUD general --- */
+#HUD {
+    position: fixed;
+    top: 15px;
+    left: 15px;
+    color: #fff;
+    font-family: Arial, sans-serif;
+    font-size: 14px;
+    z-index: 9999;
+    pointer-events: none;
+}
+
+/* --- Barras (vida y escudo) --- */
+.barra {
+    width: 180px;
+    height: 20px;
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 4px;
+    margin-bottom: 8px;
+    position: relative;
+    overflow: hidden;
+}
+
+.barra-fill {
+    height: 100%;
+    width: 100%;
+    background: linear-gradient(90deg, #00ff66, #00cc55);
+    transition: width 0.15s linear;
+}
+
+#barra-escudo .barra-fill {
+    background: linear-gradient(90deg, #00aaff, #0088dd);
+}
+
+.barra-label {
+    position: absolute;
+    top: 2px;
+    left: 5px;
+    font-size: 12px;
+    text-shadow: 0 0 3px #000;
+}
+
+/* --- Información del arma --- */
+#arma-info {
+    margin-top: 10px;
+    background: rgba(255, 255, 255, 0.08);
+    padding: 8px 10px;
+    width: 180px;
+    border-radius: 4px;
+}
+
+#arma-info div {
+    margin-bottom: 4px;
+}
+
+#arma-info strong {
+    color: #7bd9ff;
+}
+/* Estilos para enemigos y efectos */
+/* Estilos para enemigos */
+/* Estilos para enemigos */
+/* Enemigos - Barra de vida FIJA */
+.enemigo-container {
+    position: absolute;
+    transform-origin: center;
+}
+
+.enemigo-imagen {
+    position: relative;
+    transform-origin: center;
+    transition: transform 0.1s ease, filter 0.1s ease;
+}
+
+/* Barra de vida FIJA que no rota */
+.barra-vida-enemigo {
+    position: absolute;
+    transform: translateX(-50%) !important; /* Importante para fijar */
+    transform-origin: center !important;
+    transition: none !important;
+}
+
+
+/* Balas y enemigos NO tienen wrap */
+
+/* Efecto de daño */
+@keyframes efectoDaño {
+    0%, 100% { opacity: 1; filter: brightness(1); }
+    50% { opacity: 0.7; filter: brightness(1.5); }
+}
+
+.dañado {
+    animation: efectoDaño 0.2s ease;
+}
+
+/* Efectos de daño */
+@keyframes parpadeoRojo {
+    0%, 100% { filter: brightness(1) saturate(1); }
+    50% { filter: brightness(2) saturate(2); }
+}
+
+.daño-recibido {
+    animation: parpadeoRojo 0.3s ease;
+}
+
+/* Estilos para barras de vida de enemigos */
+.barra-vida-enemigo {
+    position: absolute;
+    bottom: -5px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 40px;
+    height: 4px;
+    background: #333;
+    border-radius: 2px;
+    overflow: hidden;
+}
+
+.barra-vida-enemigo-fill {
+    height: 100%;
+    background: #4CAF50;
+    transition: width 0.3s ease;
+}
+
+/* Estilos para el HUD actualizados */
+#HUD {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    pointer-events: none;
+    z-index: 1000;
+}
+
+.barra {
+    position: fixed;
+    left: 20px;
+    width: 300px;
+    height: 30px;
+    background: rgba(0, 0, 0, 0.7);
+    border: 2px solid #333;
+    border-radius: 15px;
+    overflow: hidden;
+    pointer-events: none;
+}
+
+#barra-vida {
+    top: 20px;
+}
+
+#barra-escudo {
+    top: 60px;
+}
+
+.barra-fill {
+    height: 100%;
+    transition: width 0.3s ease;
+}
+
+#vida-fill {
+    background: linear-gradient(to right, #4CAF50, #2E7D32);
+    width: 100%;
+}
+
+#escudo-fill {
+    background: linear-gradient(to right, #2196F3, #0D47A1);
+    width: 100%;
+}
+
+.barra-label {
+    position: absolute;
+    top: 50%;
+    left: 15px;
+    transform: translateY(-50%);
+    color: white;
+    font-weight: bold;
+    font-family: Arial, sans-serif;
+    text-shadow: 1px 1px 2px black;
+    z-index: 1;
+}
+
+#arma-info {
+    position: fixed;
+    bottom: 20px;
+    left: 20px;
+    background: rgba(0, 0, 0, 0.7);
+    border: 2px solid #333;
+    border-radius: 10px;
+    padding: 15px;
+    color: white;
+    font-family: Arial, sans-serif;
+    min-width: 200px;
+    pointer-events: none;
+}
+
+#arma-info div {
+    margin-bottom: 5px;
+}
+
+#arma-info div:last-child {
+    margin-bottom: 0;
+}
+/* Asegurar que las balas sean visibles */
+.bala {
+    position: absolute !important;
+    z-index: 5 !important;
+    pointer-events: none !important;
+}
+
+/* Enemigos */
+.enemigo-container {
+    position: absolute;
+    z-index: 10;
+}
+
+.enemigo-imagen {
+    position: relative;
+    z-index: 9;
+}
+
+/* Barra de vida FIJA */
+.barra-vida-enemigo {
+    position: absolute !important;
+    transform: translateX(-50%) !important;
+    transform-origin: center !important;
+    transition: none !important;
+    z-index: 11 !important;
+}
+
+/* Efecto de colisión */
+@keyframes efectoColision {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
+.colisionando {
+    animation: efectoColision 0.2s ease;
+}
+/* Enemigos Kamikaze */
+.enemigo-kamikaze {
+    position: absolute;
+    animation: pulsacionKamikaze 2s infinite;
+}
+
+@keyframes pulsacionKamikaze {
+    0%, 100% { transform: translate(-50%, -50%) scale(1); }
+    50% { transform: translate(-50%, -50%) scale(1.05); }
+}
+
+.enemigo-imagen-kamikaze {
+    filter: hue-rotate(300deg) brightness(1.2);
+    transition: filter 0.2s ease, transform 0.1s ease;
+}
+
+/* Barra de vida kamikaze */
+.barra-vida-enemigo {
+    position: absolute;
+    top: -15px !important;
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+    transform-origin: center !important;
+    z-index: 11 !important;
+}
+
+/* Efecto de explosión kamikaze */
+@keyframes explosion {
+    0% { transform: scale(1); opacity: 1; }
+    100% { transform: scale(3); opacity: 0; }
+}
+
+.explosion {
+    animation: explosion 0.5s ease-out forwards;
+    position: absolute;
+    background: radial-gradient(circle, #FF4444, #FF8800, transparent);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 20;
+}
+
+/* Efecto de daño al jugador */
+@keyframes dañoJugador {
+    0%, 100% { border: 0 solid transparent; }
+    50% { border: 3px solid rgba(255, 68, 68, 0.8); }
+}
+
+#player.dañado {
+    animation: dañoJugador 0.3s ease;
+}
+
+/* Contador de regeneración de escudo */
+#regeneracion-escudo {
+    position: fixed;
+    bottom: 100px;
+    left: 20px;
+    color: #2196F3;
+    font-family: Arial, sans-serif;
+    font-size: 14px;
+    background: rgba(0, 0, 0, 0.7);
+    padding: 5px 10px;
+    border-radius: 5px;
+    display: none;
+    z-index: 1000;
+}

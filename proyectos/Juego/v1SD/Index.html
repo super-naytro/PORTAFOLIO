@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Juego 2D - Canvas + DIV</title>
+    <link rel="stylesheet" href="Principal.css">
+</head>
+<body>
+    <!-- Canvas para el fondo y arena -->
+    <canvas id="Engien"></canvas>
+    <!-- El DIV del jugador se crea dinámicamente en player.js -->
+     <div id="arena" >
+    <div id="player" >
+       
+    </div>
+<div id="HUD">
+    <div id="barra-vida" class="barra">
+        <div class="barra-fill" id="vida-fill"></div>
+        <span class="barra-label">Vida</span>
+    </div>
+
+    <div id="barra-escudo" class="barra">
+        <div class="barra-fill" id="escudo-fill"></div>
+        <span class="barra-label">Escudo</span>
+    </div>
+
+    <div id="arma-info">
+        <div><strong>Munición:</strong> <span id="municion-actual">0</span></div>
+        <div><strong>Cargador:</strong> <span id="capacidad-cargador">0</span></div>
+        <div><strong>Estado:</strong> <span id="estado-arma">Listo</span></div>
+    </div>
+</div>
+
+
+
+ </div>
+
+
+
+    </div>
+
+
+
+ 
+
+
+    <!-- Scripts en orden -->
+     
+     <script src="Data/Armas.js"></script>
+    <script src="Data/Naves.js"></script>
+    <script src="Data/player.js"></script>
+ <script src="Data/system.js"></script>
+    <!-- Main script (siempre el último) -->
+    <script>
+// --- MAIN ---
+
+const canvas = document.getElementById("Engien");
+const arenaDiv = document.getElementById("arena");
+
+function resize() {
+    canvas.width = innerWidth;
+    canvas.height = innerHeight;
+    arenaDiv.style.width = innerWidth + "px";
+    arenaDiv.style.height = innerHeight + "px";
+}
+
+resize();
+window.addEventListener("resize", resize);
+
+// Variable global para el jugador
+let player = null;
+
+// Esperar a que todo cargue
+window.onload = function() {
+    console.log("DOM cargado completamente");
+    
+    // Crear jugador
+    player = new Player(Naves, Armas);
+    console.log("Jugador creado:", player);
+    
+    // Iniciar sistema de juego después de 1 segundo
+    setTimeout(() => {
+        iniciarSistemaJuego(player);
+    }, 1000);
+    
+    // Bucle principal
+    function gameLoop() {
+        if (player) {
+            player.update(innerWidth, innerHeight);
+        }
+        requestAnimationFrame(gameLoop);
+    }
+    
+    gameLoop();
+};
+    </script>
+</body>
+</html>
